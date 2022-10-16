@@ -1,0 +1,64 @@
+<?xml version="1.0" ?>
+
+<class>
+
+<namespace>NVL_AI</namespace>
+<solution>SimpleGPLib</solution>
+<name>DashLogger</name>
+<description>A logger for the CodeDash</description>
+
+<includes>
+    <include name="iostream" namespace="std" local="false" />
+    <include name="CodeDash.h" local="true" />
+</includes>
+
+<variables>
+    <variable type="int" name="sessionId" code="10" />
+    <variable type="CodeDash *" name="codeDash" code="10" />
+</variables>
+
+<constructors>
+
+    <constructor type="auto" inline="false" />
+
+</constructors>
+
+<methods>
+
+    <!-- Start -->
+    <method section="Start Stop" modifiers="virtual" access="public" return="void" name="Start" description="Start a session" inline="false" />
+
+    <!-- Stop -->
+    <method section="Start Stop" modifiers="virtual" access="public" return="void" name="Stop" description="Stop a session" inline="false" />
+ 
+    <!-- Message -->
+    <method section="Message" modifiers="virtual" access="public" return="void" name="Message" description="Show a message" inline="false">
+        <parameter type="const string&" name="message" description="The message that we are raising" />
+    </method>    
+
+    <!-- Show Result -->
+    <method section="Show Result" modifiers="virtual" access="public" return="void" name="ShowResult" description="Show the best result on screen" inline="false">
+        <parameter type="const string&" name="result" description="The result that we want to display in string form" />
+    </method>    
+
+    <!-- Raise Error -->
+    <method section="Raise Error" modifiers="virtual" access="public" return="void" name="RaiseError" description="Raise an error within the system" inline="false">
+        <parameter type="const string&" name="error" description="The error that we are raising" />
+    </method>    
+
+    <!-- Update Score -->
+    <method section="Update Score" modifiers="virtual" access="public" return="void" name="UpdateScore" description="Update the current score" inline="false">
+        <parameter type="int" name="epoch" description="The epoch that we are updating the score for" />
+        <parameter type="double" name="score" description="The actual score that we are updating" />
+    </method>    
+
+</methods>
+
+<tests>
+    <test name="confirm_messaging" description="Confirm the various messages" exception="false" />
+    <test name="confirm_score_update" description="Confirm the updating of score" exception="false" />
+    <test name="confirm_start_stop" description="Confirm start stop functionality" exception="false" />
+    <test name="confirm_error" description="Confirm raising an error" exception="false" />
+</tests> 
+
+</class>

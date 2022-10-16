@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+
+<class>
+
+<namespace>NVL_Test</namespace>
+<solution>SimpleGPTests</solution>
+<name>TestRepo</name>
+<description>A repository for testing purposes</description>
+
+<includes>
+    <include name="iostream" namespace="std" local="false" />
+    <include name="DBLib/DBConnection.h" namespace="NVL_DB" local="false" />
+    <include name="DBLib/GenericRepository.h" namespace="NVL_DB" local="false" />
+</includes>
+
+<variables>
+    <variable type="DBConnection *" name="connection" code="00" />
+</variables>
+
+<constructors>
+    <constructor type="auto" inline="false" />
+</constructors>
+
+<methods>
+
+    <method section="Clear" access="public" return="void" name="Clear" description="Clear the database" inline="false" />
+
+</methods>
+
+</class>

@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+
+<class>
+
+<namespace>NVL_AI</namespace>
+<solution>SimpleGPLib</solution>
+<name>ScoreUtils</name>
+<description>A set of utilities for evaluating the performance of classification programs</description>
+
+<includes>
+    <include name="iostream" namespace="std" local="false" />
+    <include name="opencv2/opencv.hpp" namespace="cv" local="false" />
+    <include name="GeneticLib/Grammar/CodeTree.h" local="false" />
+</includes>
+
+<methods>
+
+    <!-- Load an ARFF file from disk -->
+    <method section="Load" modifiers="static" access="public" return="Mat" name="LoadARFF" description="Load an ARFF file from disk" inline="false">
+        <parameter type="const string&" name="path" description="A path to the file that we are loading" />
+    </method>    
+
+    <!-- Evaluate Script -->
+    <method section="Evaluate" modifiers="static" access="public" return="double" name="Evaluate" description="Test a script to see how it good it is" inline="false">
+        <parameter type="Mat" name="testCases" description="A set of test cases to test against" />
+        <parameter type="CodeTree *" name="solution" description="The solution that we are testing" />
+    </method>    
+
+</methods>
+
+<tests>
+    <test name="load_test" description="Confirm that loading is happening correctly" exception="false" />
+    <test name="evaluate_test" description="Confirm that evaluation is happening correctly" exception="false" />
+</tests> 
+
+</class>

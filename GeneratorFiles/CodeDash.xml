@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+
+<class terminator="true">
+
+<namespace>NVL_AI</namespace>
+<solution>SimpleGPLib</solution>
+<name>CodeDash</name>
+<description>Contains the interactions between the algorithm and code dash</description>
+
+<includes>
+    <include name="iostream" namespace="std" local="false" />
+    <include name="DBLib/DBConnection.h" namespace="NVL_DB" local="false" />
+    <include name="DBLib/GenericRepository.h" namespace="NVL_DB" local="false" />
+</includes>
+
+<variables>
+    <variable type="DBConnection *" name="connection" code="00" />
+</variables>
+
+<constructors>
+
+    <!-- Main Constructor -->
+    <constructor type="custom" inline="false">
+        <parameter type="const string&" name="path" description="A path to the configuration file" />
+    </constructor>
+
+    <!-- Secondary Constructor -->
+    <constructor type="custom" inline="false">
+        <parameter type="DBConnection *" name="connection" description="The connection to the database" />
+    </constructor>
+
+</constructors>
+
+<methods>
+    
+    <!-- Start a session -->
+    <method section="Session" access="public" return="int" name="StartSession" description="Launch a new session" inline="false">
+        <parameter type="const string&" name="algorithmCode" description="The identifier of the algorithm" />
+        <parameter type="const string&" name="problemCode" description="The identifier of the problem" />
+    </method>
+
+    <!-- End a session -->
+    <method section="Session" access="public" return="void" name="EndSession" description="End a session" inline="false">
+        <parameter type="int" name="sessionId" description="The identifier of the session" />
+    </method> 
+
+    <!-- Set a session to focus session -->
+    <method section="Session" access="public" return="void" name="SetMainSession" description="Set a session to the main session" inline="false">
+        <parameter type="int" name="sessionId" description="The identifier of the session" />
+    </method> 
+
+    <!-- Update the score -->
+    <method section="Update" access="public" return="void" name="UpdateScore" description="Update the latest score in the current session" inline="false">
+        <parameter type="int" name="sessionId" description="The identifier of the session" />
+        <parameter type="int" name="epoch" description="The current epoch" />
+        <parameter type="double" name="score" description="The score that we are updating" />
+    </method> 
+
+    <!-- Update the best code -->
+    <method section="Update" access="public" return="void" name="SetBestCode" description="Set the current best score solution" inline="false">
+        <parameter type="int" name="sessionId" description="The identifier of the session" />
+        <parameter type="const string&" name="code" description="The code of the current best solution" />
+    </method> 
+
+    <method section="Update" access="public" return="void" name="SetMessage" description="Display an output message on the screen" inline="false">
+        <parameter type="int" name="sessionId" description="The identifier of the session" />
+        <parameter type="const string&" name="message" description="The message we are displaying" />
+    </method> 
+
+    <!-- Get the training data path -->
+    <method section="Getter" access="public" return="string" name="GetTrainingPath" description="Get the path to the training file" inline="false">
+        <parameter type="const string&" name="problemCode" description="The associated problem code" />
+    </method> 
+
+</methods>
+
+<tests>
+    <test name="create_session" description="Tests the session handling" exception="false" />
+    <test name="update_score" description="Update the current score" exception="false" />
+    <test name="set_best_code" description="Update the best code flag" exception="false" />
+    <test name="set_message" description="Set a message against the session" exception="false" />
+    <test name="get_training_path" description="Retrieve the current training path" exception="false" />
+</tests> 
+
+</class>

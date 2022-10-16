@@ -1,0 +1,8 @@
+#---------------------------------------------
+# Defines a .gitignore file for the solution
+#
+# author: Wild Boar
+#---------------------------------------------
+
+# Build Files
+build/

@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+
+<class>
+
+<namespace>NVL_AI</namespace>
+<solution>SimpleGPLib</solution>
+<name>Session</name>
+<description>Defines details about the session</description>
+
+<includes>
+    <include name="iostream" namespace="std" local="false" />
+</includes>
+
+<variables>
+    <variable type="string" name="algorithm" code="10" />
+    <variable type="string" name="problem" code="10" />
+    <variable type="string" name="status" code="10" />
+    <variable type="bool" name="focus" code="10" />
+</variables>
+
+<constructors>
+    <constructor type="auto" inline="true" />
+</constructors>
+
+</class>
