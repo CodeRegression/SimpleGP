@@ -51,5 +51,7 @@ namespace NVL_AI
 		string BuildParamString(const unordered_map<string, string>& parameters);
 
 		static string GetTagContent(const string& tag);
+
+		static string Escape(const string& value);
 	};
 }

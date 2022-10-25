@@ -134,7 +134,7 @@ void CodeDash::UpdateSolution(int sessionId, const string& solution)
 	auto parameters = unordered_map<string, string>();
 	parameters["operation"] = "SOLUTION";
 	parameters["session"] = NVLib::StringUtils::Int2String(sessionId);
-	parameters["solution"] = solution;
+	parameters["solution"] = Escape(solution);
 	auto response = FireRequest(parameters);
 	if (response.Error != string()) throw runtime_error(response.Error);
 }
@@ -285,5 +285,26 @@ string CodeDash::GetTagContent(const string& tag)
 	}
 
 	// Return the result
+	return result.str();
+}
+
+/**
+ * @brief Add the logic to escape a string
+ * @param value The value that we are escaping 
+ * @return string The string value
+ */
+string CodeDash::Escape(const string& value) 
+{
+	auto result = stringstream();
+
+	for (auto & character : value) 
+	{
+		if (character == '&') result << "%26";
+		else if (character == ';') result << "%3B";
+		else if (character == '<') result << "%3C";
+		else if (character == '>') result << "%3E";
+		else result << character;
+	}
+
 	return result.str();
 }

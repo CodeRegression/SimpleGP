@@ -51,13 +51,12 @@ Engine::~Engine()
  */
 void Engine::Run()
 {
-    while(true) 
-    {
-        NVLib::RandomUtils::TimeSeedRandomNumbers();
-
-        auto result = PerformIteration();
-        if (result >= 100) break;
-    }
+    //while(true) 
+    //{
+    NVLib::RandomUtils::TimeSeedRandomNumbers();
+    auto result = PerformIteration();
+    //if (result >= 100) break;
+    //}
 }
 
 /**

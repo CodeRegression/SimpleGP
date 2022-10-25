@@ -133,7 +133,8 @@ Socket* Socket::accept(){
     newSocket->address_info.ai_addr = (struct sockaddr *)&their_addr;
     return newSocket;
 }
-int Socket::socket_write(string msg){
+int Socket::socket_write(string msg)
+{
     const char * buf = msg.c_str();
     int len = (int)strlen(buf);
     int status = (int)send(sock, buf, len, 0);
