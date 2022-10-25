@@ -34,6 +34,7 @@ DashLogger::DashLogger(int sessionId, CodeDash * codeDash)
 void DashLogger::Start()
 {
 	_codeDash->StartSession(_sessionId);
+	cout << "Starting Session" << endl;
 }
 
 /**
@@ -41,7 +42,8 @@ void DashLogger::Start()
  */
 void DashLogger::Stop()
 {
-	_codeDash->TerminateSession(_sessionId);
+	_codeDash->EndSession(_sessionId);
+	cout << "Stopping Session" << endl;
 }
 
 //--------------------------------------------------
@@ -55,6 +57,7 @@ void DashLogger::Stop()
 void DashLogger::Message(const string& message)
 {
 	_codeDash->SetMessage(_sessionId, message);
+	cout << "Message: " << message << endl;
 }
 
 //--------------------------------------------------
@@ -67,7 +70,8 @@ void DashLogger::Message(const string& message)
  */
 void DashLogger::ShowResult(const string& result)
 {
-	_codeDash->SetBestCode(_sessionId, result);
+	_codeDash->UpdateSolution(_sessionId, result);
+	cout << "Solution Update: " << result << endl;
 }
 
 //--------------------------------------------------
@@ -80,7 +84,8 @@ void DashLogger::ShowResult(const string& result)
  */
 void DashLogger::RaiseError(const string& error)
 {
-	_codeDash->RaiseError(_sessionId, error);
+	_codeDash->SetMessage(_sessionId, error);
+	cout << "Error: " << error << endl;
 }
 
 //--------------------------------------------------
@@ -95,4 +100,5 @@ void DashLogger::RaiseError(const string& error)
 void DashLogger::UpdateScore(int epoch, double score)
 {
 	_codeDash->UpdateScore(_sessionId, epoch, score);
+	cout << "Score Update: " << score << endl;
 }

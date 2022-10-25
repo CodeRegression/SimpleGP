@@ -21,7 +21,12 @@ using namespace NVL_App;
 Engine::Engine(Logger* logger, NVLib::Parameters* parameters) 
 {
     _logger = logger; _parameters = parameters;
-    _codeDash = new NVL_AI::CodeDash("dbconnect.xml");
+
+    auto server = ArgUtils::GetString(parameters, "server");
+    auto port = ArgUtils::GetString(parameters, "port");
+    _machine = ArgUtils::GetString(parameters, "machine");
+
+    _codeDash = new NVL_AI::CodeDash(server, port);
     _scoreFinder = LoadScoreFinder();
     _candidateFactory = LoadCandidateFactory();
 }
@@ -68,9 +73,8 @@ double Engine::PerformIteration()
 
     // Setup the session and give it focus
     auto problemCode = ArgUtils::GetString(_parameters, "problem");
-    _sessionId = _codeDash->CreateSession(NVL_AI::Constants::ALGORITHM_CODE, problemCode);
-    _codeDash->UpdateScore(_sessionId, 0, 0);
-    _codeDash->FocusSession(_sessionId);
+    _sessionId = _codeDash->CreateSession(NVL_AI::Constants::ALGORITHM_CODE, problemCode, _machine);
+    cout << "Created session: " << _sessionId << endl;
 
     // Kick off the execution
     auto runner = new NVL_AI::GeneticRunner(_candidateFactory, populationSize, sampleSize);
@@ -100,18 +104,9 @@ double Engine::PerformIteration()
  * @return NVL_AI::ScoreFinder The score finder that we are loading
  */
 NVL_AI::ScoreFinder * Engine::LoadScoreFinder() 
-{
-    // Get the website folder
-    auto folder = _codeDash->GetMeta(NVL_AI::Constants::META_SITE_LOCATION);
-    if (folder == string()) throw runtime_error("Unable to determine the website location");
-
-    // Get the training file name
-    auto problemCode = ArgUtils::GetString(_parameters, "problem");
-    auto trainingFile = _codeDash->GetTrainingPath(problemCode);
-    if (trainingFile == string()) throw runtime_error("Unable to find training code: " + problemCode);
-
+ {
     // Build the training file path
-    auto trainingPath = NVLib::FileUtils::PathCombine(folder, trainingFile);
+    auto trainingPath = ArgUtils::GetString(_parameters, "training");
 
     // Return the score finder
     return new NVL_AI::ScoreFinder(trainingPath);

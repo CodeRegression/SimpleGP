@@ -36,6 +36,7 @@ namespace NVL_App
 		NVL_AI::CodeDash * _codeDash;
 		NVL_AI::ScoreFinder * _scoreFinder;
 		NVL_AI::CandidateFactory * _candidateFactory;
+		string _machine;
 	public:
 		Engine(Logger* logger, NVLib::Parameters * parameters);
 		~Engine();

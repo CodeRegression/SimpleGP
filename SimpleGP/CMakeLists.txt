@@ -7,7 +7,7 @@
 #--------------------------------------------------------
 
 # Setup the includes
-include_directories("../" "${LIBRARY_BASE}/NVLib" "${LIBRARY_BASE}/GeneticLib" "${LIBRARY_BASE}/DBLib" )
+include_directories("../" "${LIBRARY_BASE}/NVLib" "${LIBRARY_BASE}/GeneticLib" )
 
 # Create the executable
 add_executable(SimpleGP
@@ -16,7 +16,7 @@ add_executable(SimpleGP
 )
 
 # Add link libraries                               
-target_link_libraries(SimpleGP SimpleGPLib NVLib GeneticLib DBLib ${OpenCV_LIBS} ${LIBMYSQLCLIENT_LIBRARIES} uuid)
+target_link_libraries(SimpleGP SimpleGPLib NVLib GeneticLib ${OpenCV_LIBS} ${LIBMYSQLCLIENT_LIBRARIES} uuid)
 
 # Copy Resources across
 add_custom_target(resource_copy ALL

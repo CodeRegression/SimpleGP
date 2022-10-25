@@ -6,7 +6,11 @@
     <depth_limit>"5"</depth_limit>
     <statement_limit>"5"</statement_limit>
     <mutate_prob>"0.4"</mutate_prob>
-    <iteration>"40"</iteration>
-    <population>"40000"</population>
+    <iteration>"30"</iteration>
+    <population>"5000"</population>
     <sample>"15"</sample>
+    <server>"192.168.1.130"</server>
+    <port>"80"</port>
+    <machine>"192.168.1.109"</machine>
+    <training>Input/problem_0000.arff</training> 
 </opencv_storage>

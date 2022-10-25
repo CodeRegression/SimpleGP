@@ -21,16 +21,11 @@ set_target_properties(UnitTestLib PROPERTIES
 
 # Create the executable
 add_executable (SimpleGPTests
-	Helpers/TestRepo.cpp
-	Tests/Example_Tests.cpp
 	Tests/ScoreUtils_Tests.cpp
-	Tests/CodeDash_Tests.cpp
-	Tests/DashLogger_Tests.cpp
 )
 
-
 # Add link libraries
-target_link_libraries(SimpleGPTests SimpleGPLib NVLib GeneticLib  DBLib ${OpenCV_LIBS} ${LIBMYSQLCLIENT_LIBRARIES} UnitTestLib GTest::Main uuid)
+target_link_libraries(SimpleGPTests SimpleGPLib NVLib GeneticLib ${OpenCV_LIBS} ${LIBMYSQLCLIENT_LIBRARIES} UnitTestLib GTest::Main uuid)
 
 # Find the associated unit tests
 gtest_discover_tests(SimpleGPTests)

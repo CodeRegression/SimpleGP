@@ -1,53 +1,55 @@
 //--------------------------------------------------
-// Contains the interactions between the algorithm and code dash
+// The main logic for communicating with the code dash library
 //
 // @author: Wild Boar
 //
-// @date: 2022-10-03
+// @date: 2022-10-24
 //--------------------------------------------------
 
 #pragma once
 
+#include <sstream>
+#include <unordered_map>
 #include <iostream>
 using namespace std;
 
 #include <NVLib/StringUtils.h>
 
-#include <DBLib/DBConnection.h>
-#include <DBLib/GenericRepository.h>
-using namespace NVL_DB;
-
-#include "Globals.h"
+#include "Socket.h"
 
 namespace NVL_AI
 {
 	class CodeDash
 	{
 	private:
-		bool _handleConnection;
-		DBConnection * _connection;
+		string _server;
+		string _port;
+
+		struct Response 
+		{ 
+			Response(int sessionId, const string& error) : SessionId(sessionId), Error(error) {}
+			int SessionId; 
+			string Error; 
+		};
+
 	public:
-		CodeDash(const string& path);
-		CodeDash(DBConnection * connection);
+		CodeDash(const string& server, const string& port);
 
-		~CodeDash();
-
-		int CreateSession(const string& algorithmCode, const string& problemCode);
+		int CreateSession(const string& algorithmCode, const string& problemCode, const string& machineName);
 		void StartSession(int sessionId);
 		void PauseSession(int sessionId);
-		void TerminateSession(int sessionId);
-		void FocusSession(int sessionId);
+		void EndSession(int sessionId);
+		void FailSession(int sessionId, const string& message);
 
 		void UpdateScore(int sessionId, int epoch, double score);
-		void SetBestCode(int sessionId, const string& code);
+		void UpdateSolution(int sessionId, const string& solution);
 		void SetMessage(int sessionId, const string& message);
-		void RaiseError(int sessionId, const string& message);
 
-		string GetTrainingPath(const string& problemCode);
-		string GetMeta(const string& key);
+		static CodeDash::Response Parse(const string& value);
 	private:
-		int GetAlgorithmId(const string& code);
-		int GetProblemId(const string& code);
-		int GetStatusId(const string& code);
+		CodeDash::Response FireRequest(const unordered_map<string, string>& parameters);
+		string BuildParamString(const unordered_map<string, string>& parameters);
+
+		static string GetTagContent(const string& tag);
 	};
 }

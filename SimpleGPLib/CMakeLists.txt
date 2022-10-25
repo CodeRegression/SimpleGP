@@ -19,5 +19,5 @@ add_library (SimpleGPLib STATIC
 	ScoreUtils.cpp
 	CodeDash.cpp
 	DashLogger.cpp
+	Socket.cpp
 )
-

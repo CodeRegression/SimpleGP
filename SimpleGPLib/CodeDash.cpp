@@ -3,7 +3,7 @@
 //
 // @author: Wild Boar
 //
-// @date: 2022-10-03
+// @date: 2022-10-24
 //--------------------------------------------------
 
 #include "CodeDash.h"
@@ -15,30 +15,12 @@ using namespace NVL_AI;
 
 /**
  * @brief Custom Constructor
- * @param path A path to the configuration file
+ * @param server The server that we are connecting to
+ * @param port The port that we are connecting to
  */
-CodeDash::CodeDash(const string& path)
+CodeDash::CodeDash(const string& server, const string& port) : _server(server), _port(port)
 {
-	_connection = new DBConnection(path);
-	_handleConnection = true;
-}
-
-/**
- * @brief Custom Constructor
- * @param connection The connection to the database
- */
-CodeDash::CodeDash(DBConnection * connection)
-{
-	_connection = connection;
-	_handleConnection = false;
-}
-
-/**
- * @brief Main Terminator
- */
-CodeDash::~CodeDash()
-{
-	if (_handleConnection) delete _connection;
+	// Extra connection can come here
 }
 
 //--------------------------------------------------
@@ -46,105 +28,79 @@ CodeDash::~CodeDash()
 //--------------------------------------------------
 
 /**
- * @brief Create a new session
- * @param algorithmCode The identifier of the algorithm
- * @param problemCode The identifier of the problem
+ * @brief Logic to create a new session
+ * @param algorithmCode The algorithm that is being run
+ * @param problemCode The problem that the algorithm is being asked to solve
+ * @param machineName The name of the machine that the session is being run from
  * @return int Returns a int
  */
-int CodeDash::CreateSession(const string& algorithmCode, const string& problemCode)
+int CodeDash::CreateSession(const string& algorithmCode, const string& problemCode, const string& machineName)
 {
-	// Get codes
-	auto statusId = GetStatusId(Constants::STATUS_CREATED);
-	auto algorithmId = GetAlgorithmId(algorithmCode);
-	auto problemId = GetProblemId(problemCode);
-	if (algorithmId == -1 || problemId == -1) throw runtime_error("Unregistered problem solver or problem");
-
-	// Create the query
-	auto query = stringstream();
-	query << "INSERT INTO `session`(`algorithm_id`, `problem_id`, `status_id`,`epoch`,`best_score`,`focus`) ";
-	query << "VALUES (";
-	query << algorithmId << ", ";
-	query << problemId << ", ";
-	query << statusId << ", ";
-	query << "0,0,0);"; 
-
-	// Fire the query
-	return GenericRepository(_connection).FireCreate(query.str());
-}
-
-/**
- * @brief Start a new session within the system 
- * @param sessionId The session identifier
- */
-void CodeDash::StartSession(int sessionId) 
-{
-	// Get the status id
-	auto statusId = GetStatusId(Constants::STATUS_START);
-
-	// Create the query
-	auto query = stringstream();
-	query << "UPDATE `session` SET ";
-	query << "`start` = '" << NVLib::StringUtils::GetDateTimeString() << "', ";
-	query << "`status_id` = " << statusId << " WHERE id = " << sessionId << ";";
-
-	// Fire the query
-	GenericRepository(_connection).FireUpdate(query.str());
-}
-
-/**
- * @brief Add the logic to pause a given session 
- * @param sessionId The identifier of the session
- */
-void CodeDash::PauseSession(int sessionId) 
-{
-	// Get the status id
-	auto statusId = GetStatusId(Constants::STATUS_STOP);
-
-	// Create the query
-	auto query = stringstream();
-	query << "UPDATE `session` SET ";
-	query << "`end` = '" << NVLib::StringUtils::GetDateTimeString() << "', ";
-	query << "`status_id` = " << statusId << " WHERE id = " << sessionId << ";";
-
-	// Fire the query
-	GenericRepository(_connection).FireUpdate(query.str());
-}
-
-/**
- * @brief End a session
- * @param sessionId The identifier of the session
- */
-void CodeDash::TerminateSession(int sessionId)
-{
-	// Get the status id
-	auto statusId = GetStatusId(Constants::STATUS_END);
-
-	// Create the query
-	auto query = stringstream();
-	query << "UPDATE `session` SET ";
-	query << "`end` = '" << NVLib::StringUtils::GetDateTimeString() << "', ";
-	query << "`status_id` = " << statusId << " WHERE id = " << sessionId << ";";
-
-	// Fire the query
-	GenericRepository(_connection).FireUpdate(query.str());
-}
-
-/**
- * @brief Set a session to the main session
- * @param sessionId The identifier of the session
- */
-void CodeDash::FocusSession(int sessionId)
-{
-	// Create a repo
-	auto repo = GenericRepository(_connection);
+	auto parameters = unordered_map<string, string>();
+	parameters["operation"] = "CREATE";
+	parameters["algorithm"] = algorithmCode;
+	parameters["problem"] = problemCode;
+	parameters["machine"] = machineName;
 	
-	// Set no session to have focus
-	repo.FireUpdate("UPDATE `session` SET `focus` = 0;");
+	auto response = FireRequest(parameters);
 
-	// Set the focus session to now have the focus
-	auto query = stringstream();
-	query << "UPDATE `session` SET `focus` = 1 WHERE `id` = " << sessionId << ";";
-	repo.FireUpdate(query.str());
+	if (response.Error != string()) throw runtime_error(response.Error);
+
+	return response.SessionId;
+}
+
+/**
+ * @brief Logic to start a session
+ * @param sessionId The identifier of the session that we are running
+ */
+void CodeDash::StartSession(int sessionId)
+{
+	auto parameters = unordered_map<string, string>();
+	parameters["operation"] = "START";
+	parameters["session"] = NVLib::StringUtils::Int2String(sessionId);
+	auto response = FireRequest(parameters);
+	if (response.Error != string()) throw runtime_error(response.Error);
+}
+
+/**
+ * @brief Logic to pause a session
+ * @param sessionId The identifier of the session that we are running
+ */
+void CodeDash::PauseSession(int sessionId)
+{
+	auto parameters = unordered_map<string, string>();
+	parameters["operation"] = "PAUSE";
+	parameters["session"] = NVLib::StringUtils::Int2String(sessionId);
+	auto response = FireRequest(parameters);
+	if (response.Error != string()) throw runtime_error(response.Error);
+}
+
+/**
+ * @brief Logic to terminate a session
+ * @param sessionId The identifier of the session that we are running
+ */
+void CodeDash::EndSession(int sessionId)
+{
+	auto parameters = unordered_map<string, string>();
+	parameters["operation"] = "END";
+	parameters["session"] = NVLib::StringUtils::Int2String(sessionId);
+	auto response = FireRequest(parameters);
+	if (response.Error != string()) throw runtime_error(response.Error);
+}
+
+/**
+ * @brief Logic to fail a session
+ * @param sessionId The identifier of the session that we are running
+ * @param message A description of why the session failed
+ */
+void CodeDash::FailSession(int sessionId, const string& message)
+{
+	auto parameters = unordered_map<string, string>();
+	parameters["operation"] = "FAIL";
+	parameters["session"] = NVLib::StringUtils::Int2String(sessionId);
+	parameters["message"] = message;
+	auto response = FireRequest(parameters);
+	if (response.Error != string()) throw runtime_error(response.Error);
 }
 
 //--------------------------------------------------
@@ -152,208 +108,182 @@ void CodeDash::FocusSession(int sessionId)
 //--------------------------------------------------
 
 /**
- * @brief Update the latest score in the current session
- * @param sessionId The identifier of the session
- * @param epoch The current epoch
- * @param score The score that we are updating
+ * @brief Update the score in the session
+ * @param sessionId The identifier of the session that we are running
+ * @param epoch The current epoch that we are updating
+ * @param score The actual score that we are updating
  */
 void CodeDash::UpdateScore(int sessionId, int epoch, double score)
 {
-	// Create a repository
-	auto repo = GenericRepository(_connection);
-
-	// Set the focus session to now have the focus
-	auto query = stringstream();
-	query << "UPDATE `session` SET `epoch` = " << epoch << ", `best_score` = " << score << " WHERE `id` = " << sessionId << ";";
-
-	// Fire the update
-	repo.FireUpdate(query.str());
-
-	// Set a query to update the score
-	query = stringstream();
-	query << "INSERT INTO `score`(`session_id`,`epoch`,`score`) VALUES (";
-	query << sessionId << ", ";
-	query << epoch << ", ";
-	query << score << ")";
-
-	// Fire the update
-	repo.FireUpdate(query.str());
+	auto parameters = unordered_map<string, string>();
+	parameters["operation"] = "SCORE";
+	parameters["session"] = NVLib::StringUtils::Int2String(sessionId);
+	parameters["epoch"] = NVLib::StringUtils::Int2String(epoch);
+	parameters["score"] = NVLib::StringUtils::Double2String(score);
+	auto response = FireRequest(parameters);
+	if (response.Error != string()) throw runtime_error(response.Error);
 }
 
 /**
- * @brief Set the current best score solution
- * @param sessionId The identifier of the session
- * @param code The code of the current best solution
+ * @brief Update best solution in the session
+ * @param sessionId The identifier of the session that we are running
+ * @param solution The best solution that we are setting
  */
-void CodeDash::SetBestCode(int sessionId, const string& code)
+void CodeDash::UpdateSolution(int sessionId, const string& solution)
 {
-	// Set the focus session to now have the focus
-	auto query = stringstream();
-	query << "UPDATE `session` SET `best_solution` = '" << code << "' WHERE `id` = " << sessionId << ";";
-
-	// Fire the update
-	GenericRepository(_connection).FireUpdate(query.str());
+	auto parameters = unordered_map<string, string>();
+	parameters["operation"] = "SOLUTION";
+	parameters["session"] = NVLib::StringUtils::Int2String(sessionId);
+	parameters["solution"] = solution;
+	auto response = FireRequest(parameters);
+	if (response.Error != string()) throw runtime_error(response.Error);
 }
 
 /**
- * @brief Display an output message on the screen
- * @param sessionId The identifier of the session
- * @param message The message we are displaying
+ * @brief Update the message associated with the session
+ * @param sessionId The identifier of the session that we are running
+ * @param message The message that we are setting
  */
 void CodeDash::SetMessage(int sessionId, const string& message)
 {
-	// Set the focus session to now have the focus
-	auto query = stringstream();
-	query << "UPDATE `session` SET `message` = '" << message << "' WHERE `id` = " << sessionId << ";";
-
-	// Fire the update
-	GenericRepository(_connection).FireUpdate(query.str());
-}
-
-/**
- * @brief Raise an error for the system 
- * @param sessionId The session identifier
- * @param message The error message
- */
-void CodeDash::RaiseError(int sessionId, const string& message) 
-{
-	auto statusId = GetStatusId(Constants::STATUS_FAIL);
-
-	// Create the query
-	auto query = stringstream();
-	query << "UPDATE `session` SET ";
-	query << "`message` = '" << message << "', ";
-	query << "`status_id` = " << statusId << " WHERE id = " << sessionId << ";";
-
-	// Fire the query
-	GenericRepository(_connection).FireUpdate(query.str());
+	auto parameters = unordered_map<string, string>();
+	parameters["operation"] = "MESSAGE";
+	parameters["session"] = NVLib::StringUtils::Int2String(sessionId);
+	parameters["message"] = message;
+	auto response = FireRequest(parameters);
+	if (response.Error != string()) throw runtime_error(response.Error);
 }
 
 //--------------------------------------------------
-// Getter
+// Communication Helper
 //--------------------------------------------------
 
 /**
- * @brief Get the path to the training file
- * @param problemCode The associated problem code
- * @return string Returns a string
+ * @brief Fires off requests and gets responses 
+ * @param parameters The parameters that we are passing off
+ * @return Response The response that we received
  */
-string CodeDash::GetTrainingPath(const string& problemCode)
+CodeDash::Response CodeDash::FireRequest(const unordered_map<string, string>& parameters) 
 {
-	// Build the query
-	auto query = stringstream();
-	query << "SELECT `training_file` FROM `problem` WHERE `code` = '" << problemCode << "';";
+	// Setup the socket
+	string ip = Socket::ipFromHostName(_server); 
+    string port = _port; 
+    Socket *sock = new Socket(AF_INET, SOCK_STREAM, 0);  
+    sock->connect(ip, port); 
 
-	// Fire the query
-	auto response = GenericRepository(_connection).FireQuery(query.str());
+	// Build up the parameter string
+	auto paramString = BuildParamString(parameters);
 
-	// Extract the solution
-	auto result = string();
-	if (response->GetRowCount() == 1) result = response->GetRow(0)->Get(0).AsString();
+	// Build the request
+    auto request = stringstream();
+    request << "POST /CodeDash/?current_page=dash_comms HTTP/1.1\r\n";
+    request << "Host: " << _server << "\r\n";
+    request << "Content-Type: application/x-www-form-urlencoded\r\n";
+    request << "Content-Length: " << paramString.length() << "\r\n\r\n";
+    request << paramString << "\r\n";
 
-	// Free data
-	delete response;
+	// Fire off the request
+    sock->socket_write(request.str());
+    int seconds = 10;
+    vector<Socket> reads(1);
+    reads[0] = *sock;
 
-	// Return the result
-	return result;
+	// Get the response
+    if(sock->select(&reads, NULL, NULL, seconds) < 1)
+    {
+        return CodeDash::Response(-1, "No reply received - something went wrong");
+    }
+    else
+    {
+        string buffer;
+        sock->socket_read(buffer, 1024);
+        //cout << buffer << endl;
+		return Parse(buffer);
+    }
 }
 
 /**
- * @brief Retrieve the algorithm identifier
- * @param code The code of the given algorithm 
- * @return int The identifier of the algorithm
+ * @brief Build the associated result string 
+ * @param parameters The parameter string
+ * @return string The string that we were building
  */
-int CodeDash::GetAlgorithmId(const string& code) 
+string CodeDash::BuildParamString(const unordered_map<string, string>& parameters) 
 {
-	// Build the query
-	auto query = stringstream();
-	query << "SELECT `id` FROM `algorithm` WHERE `code` = '" << code << "';";
+	auto result = stringstream(); auto first = true;
 
-	// Fire the query
-	auto response = GenericRepository(_connection).FireQuery(query.str());
+	for (auto& pair : parameters) 
+	{
+		if (first) first = false; 
+		else result << "&";
+		result << pair.first << "=" << pair.second;
+	}
 
-	// Extract the solution
-	auto result = -1;
-	if (response->GetRowCount() == 1) result = response->GetRow(0)->Get(0).AsInt();
-
-	// Free data
-	delete response;
-
-	// Return the result
-	return result;
+	return result.str();
 }
 
 /**
- * @brief Retrieve the problem identifier 
- * @param code The code of the given problem
- * @return int The identifier of the problem
+ * @brief Perform the parsing of the application
+ * @param value The value that we are parsing 
+ * @return CodeDash::Response The response that we got
  */
-int CodeDash::GetProblemId(const string& code) 
+CodeDash::Response CodeDash::Parse(const string& value) 
 {
-	// Build the query
-	auto query = stringstream();
-	query << "SELECT `id` FROM `problem` WHERE `code` = '" << code << "';";
+	// Create a reader
+	auto reader = stringstream(value);
 
-	// Fire the query
-	auto response = GenericRepository(_connection).FireQuery(query.str());
+	// Create a line
+	auto line = string();
 
-	// Extract the solution
-	auto result = -1;
-	if (response->GetRowCount() == 1) result = response->GetRow(0)->Get(0).AsInt();
+	// Create place holders for variables
+	auto sessionId = 0; auto message = string(); int found = 0;
 
-	// Free data
-	delete response;
+	while(true) 
+	{
+		if (reader.eof() || found >= 2) break;
+
+		getline(reader, line);
+
+		if (NVLib::StringUtils::StartsWith(line, "<session_id>")) 
+		{
+			found++;
+			auto content = GetTagContent(line);
+			if (content != string()) sessionId = NVLib::StringUtils::String2Int(content); 
+		}
+		else if (NVLib::StringUtils::StartsWith(line, "<error>")) 
+		{
+			found++;
+			message = GetTagContent(line);
+		}
+	}
 
 	// Return the result
-	return result;
+	return CodeDash::Response(sessionId, message);
 }
 
 /**
- * @brief Retrieve the status identifier of the problem 
- * @param code The status code
- * @return int The identifier of the status
+ * @brief Add the logic to get the tag content
+ * @param tag The tag that we are getting the content for 
+ * @return string The content of the tag
  */
-int CodeDash::GetStatusId(const string& code) 
+string CodeDash::GetTagContent(const string& tag) 
 {
-	// Build the query
-	auto query = stringstream();
-	query << "SELECT `id` FROM `status` WHERE `code` = '" << code << "';";
+	// Create working variables
+	auto start = false; auto result = stringstream();
 
-	// Fire the query
-	auto response = GenericRepository(_connection).FireQuery(query.str());
-
-	// Extract the solution
-	auto result = -1;
-	if (response->GetRowCount() == 1) result = response->GetRow(0)->Get(0).AsInt();
-
-	// Free data
-	delete response;
+	// Loop thru the characters
+	for (auto & character : tag) 
+	{
+		if (!start) 
+		{
+			if (character == '>') start = true;
+		}
+		else 
+		{
+			if (character == '<') break;
+			result << character;
+		}
+	}
 
 	// Return the result
-	return result;
-}
-
-/**
- * @brief Retrieve meta data
- * @param key The key of the data we are retrieving 
- * @return string The value that is retrieved
- */
-string CodeDash::GetMeta(const string& key) 
-{
-	// Build the query
-	auto query = stringstream();
-	query << "SELECT `value` FROM `meta` WHERE `parameter` = '" << key << "';";
-
-	// Fire the query
-	auto response = GenericRepository(_connection).FireQuery(query.str());
-
-	// Extract the solution
-	auto result = string();
-	if (response->GetRowCount() == 1) result = response->GetRow(0)->Get(0).AsString();
-
-	// Free data
-	delete response;
-
-	// Return the result
-	return result;
+	return result.str();
 }

@@ -33,25 +33,12 @@ set_target_properties(GeneticLib PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${LIBRARY_BASE}/GeneticLib"
 )
 
-# Add the DBLib library to the project
-add_library(DBLib STATIC IMPORTED)
-set_target_properties(DBLib PROPERTIES
-    IMPORTED_LOCATION "${LIBRARY_BASE}/DBLib/build/DBLib/libDBLib.a"
-    INTERFACE_INCLUDE_DIRECTORIES "${LIBRARY_BASE}/DBLib"
-)
-
 # Add OpenCV to the solution
 find_package( OpenCV REQUIRED)
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
 # Search for modules
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBMYSQLCLIENT REQUIRED mysqlclient)
-
-# Find all the mysql components
-foreach(FLAG ${LIBMYSQLCLIENT_CFLAGS_OTHER})
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${FLAG}")
-endforeach()
 
 # Add the available subfolders
 add_subdirectory(SimpleGPLib)
