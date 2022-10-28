@@ -12,7 +12,7 @@
 #include <iostream>
 using namespace std;
 
-#include <GeneticLib/Grammar/CodeTree.h>
+#include <SimpleGPLib/Grammar/CodeTree.h>
 #include <GeneticLib/Model/CandidateBase.h>
 
 namespace NVL_AI

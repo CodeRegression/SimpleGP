@@ -16,7 +16,7 @@ using namespace cv;
 
 #include <NVLib/StringUtils.h>
 
-#include <GeneticLib/Grammar/CodeTree.h>
+#include <SimpleGPLib/Grammar/CodeTree.h>
 
 namespace NVL_AI
 {

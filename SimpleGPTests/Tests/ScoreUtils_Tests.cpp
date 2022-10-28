@@ -13,8 +13,8 @@
 #include <SimpleGPLib/ScoreUtils.h>
 using namespace NVL_AI;
 
-#include <GeneticLib/Grammar/DecisionNode.h>
-#include <GeneticLib/Grammar/LiteralNode.h>
+#include <SimpleGPLib/Grammar/DecisionNode.h>
+#include <SimpleGPLib/Grammar/LiteralNode.h>
 
 //--------------------------------------------------
 // Function Prototypes
@@ -87,7 +87,7 @@ TEST(ScoreUtils_Test, evaluate_test)
 	auto score = ScoreUtils::Evaluate(testData, &codeTree);
 
 	// Confirm
-	ASSERT_NEAR(score, 2.0 / 3.0, 1e-8);
+	ASSERT_NEAR(score, 200 / 3.0, 1e-8);
 }
 
 //--------------------------------------------------

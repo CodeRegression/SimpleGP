@@ -11,8 +11,7 @@
 #include <iostream>
 using namespace std;
 
-#include <GeneticLib/Grammar/Mutator.h>
-
+#include <SimpleGPLib/Grammar/Mutator.h>
 #include <GeneticLib/Utility/MutationBase.h>
 
 #include "Candidate.h"

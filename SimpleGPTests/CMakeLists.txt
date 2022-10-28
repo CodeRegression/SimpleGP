@@ -22,6 +22,15 @@ set_target_properties(UnitTestLib PROPERTIES
 # Create the executable
 add_executable (SimpleGPTests
 	Tests/ScoreUtils_Tests.cpp
+    Tests/BooleanStatement_Tests.cpp
+    Tests/BreadthIterator_Tests.cpp
+    Tests/Breed_Tests.cpp
+    Tests/CandidateSelector_Tests.cpp
+    Tests/CodeTree_Tests.cpp
+    Tests/CodeTreeFactory_Tests.cpp
+    Tests/DecisionNode_Tests.cpp
+    Tests/Memory_Tests.cpp
+    Tests/Mutator_Tests.cpp
 )
 
 # Add link libraries

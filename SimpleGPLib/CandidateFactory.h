@@ -14,8 +14,8 @@ using namespace std;
 #include "Candidate.h"
 #include "ScoreFinder.h"
 
-#include <GeneticLib/Grammar/CodeTreeFactory.h>
-#include <GeneticLib/Grammar/GeneSelector.h>
+#include <SimpleGPLib/Grammar/CodeTreeFactory.h>
+#include <SimpleGPLib/Grammar/GeneSelector.h>
 
 #include <GeneticLib/Utility/CandidateFactoryBase.h>
 

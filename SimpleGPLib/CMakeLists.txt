@@ -20,4 +20,12 @@ add_library (SimpleGPLib STATIC
 	CodeDash.cpp
 	DashLogger.cpp
 	Socket.cpp
+	Grammar/BooleanStatement.cpp
+	Grammar/BreadthIterator.cpp
+	Grammar/CodeTree.cpp
+	Grammar/CodeTreeFactory.cpp
+	Grammar/Comparison.cpp
+	Grammar/DecisionNode.cpp
+	Grammar/LiteralNode.cpp
+	Grammar/Mutator.cpp
 )
